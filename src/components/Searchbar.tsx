@@ -5,22 +5,44 @@ import { FormEvent, useState } from 'react'
 import { Input } from './ui/input';
 import { Button } from './ui/button';
 
+const isValidProductURL = (url: string) => {
+    try {
+        const parsedURL = new URL(url);
+        const hostname = parsedURL.hostname;
+
+        if (
+            hostname.includes('bazaar-online.gr') ||
+            hostname.includes('sklavenitis.gr') ||
+            hostname.includes('masoutis.gr')
+        ) {
+            return true;
+        }
+    } catch (error) {
+        return false;
+    }
+
+    return false;
+}
+
 const Searchbar = () => {
     const [searchPrompt, setSearchPrompt] = useState('');
     const [isLoading, setIsLoading] = useState(false);
-
     const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
         event.preventDefault();
-
+    
+        const isValidLink = isValidProductURL(searchPrompt);
+    
+        if (!isValidLink) return alert('Please provide a valid Bazaar, Sklavenitis, or Masoutis link')
+    
         try {
-        setIsLoading(true);
-
-        // Scrape the product page
-        const product = await scrapeAndStoreProduct(searchPrompt);
+            setIsLoading(true);
+    
+            // Scrape the product page
+            const product = await scrapeAndStoreProduct(searchPrompt);
         } catch (error) {
-        console.log(error);
+            console.log(error);
         } finally {
-        setIsLoading(false);
+            setIsLoading(false);
         }
     }
 

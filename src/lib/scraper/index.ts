@@ -19,13 +19,15 @@ export async function scrapeProduct(url: string) {
     // Extract the product price and title
     const result = await page.evaluate(() => {
       const titleElement = document.querySelector('.item-title');
-      const priceElement = document.querySelector('.item-DscntPrice');
+      const startingPriceElement = document.querySelector('.item-StartPrice');
+      const currentPriceElement = document.querySelector('.item-DscntPrice');
       const title = titleElement ? titleElement.textContent.trim() : '';
-      const price = priceElement ? priceElement.textContent.trim() : '';
-      return { title, price };
+      const startingPrice = startingPriceElement ? startingPriceElement.textContent.trim() : '';
+      const currentPrice = currentPriceElement ? currentPriceElement.textContent.trim() : '';
+      return { title, startingPrice, currentPrice};
     });
 
-    console.log("the title is: " + result.title + " and the price is : " + result.price);  // Should log the title and "13.27€"
+    console.log("the title is: " + result.title + " the old price was: " + result.startingPrice + " the news price is: " + result.currentPrice);  // Should log the title and "13.27€"
 
     // Close Puppeteer
     await browser.close();
