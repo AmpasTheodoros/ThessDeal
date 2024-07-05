@@ -28,22 +28,19 @@ const isValidProductURL = (url: string) => {
 const Searchbar = () => {
   const [searchPrompt, setSearchPrompt] = useState('');
   const [isLoading, setIsLoading] = useState(false);
-  const [products, setProducts] = useState([]);
 
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
 
     const isValidLink = isValidProductURL(searchPrompt);
 
-    if (!isValidLink) return alert('Please provide a valid Bazaar, Sklavenitis, or Masoutis link');
+    if(!isValidLink) return alert('Please provide a valid Amazon link')
 
     try {
       setIsLoading(true);
 
       // Scrape the product page
       const product = await scrapeAndStoreProduct(searchPrompt);
-      console.log(product);
-      setProducts([...products, product]);
     } catch (error) {
       console.log(error);
     } finally {
@@ -52,7 +49,6 @@ const Searchbar = () => {
   }
 
   return (
-    <div>
       <form 
         onSubmit={handleSubmit}
         className="flex gap-2 text-cyan-400"
@@ -72,14 +68,6 @@ const Searchbar = () => {
           {isLoading ? 'Searching...' : 'Search'}
         </Button>
       </form>
-      <section className="trending-section mt-8">
-        <div className="flex flex-wrap gap-x-8 gap-y-16">
-          {products.map((product, index) => (
-            <ProductCard key={index} product={product} />
-          ))}
-        </div>
-      </section>
-    </div>
   )
 }
 

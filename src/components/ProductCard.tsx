@@ -1,27 +1,41 @@
-const ProductCard = ({ product }) => {
-    return (
-      <div className="max-w-sm rounded overflow-hidden shadow-lg bg-white">
-        <img className="w-full" src={product.imageUrls[0]} alt={product.title} />
-        <div className="px-6 py-4">
-          <div className="font-bold text-xl mb-2">{product.title}</div>
-          <p className="text-gray-700 text-base">Old Price: {product.startingPrice}</p>
-          <p className="text-gray-700 text-base">New Price: {product.currentPrice}</p>
-          {product.discountPercent && (
-            <p className="text-gray-700 text-base">Discount: {product.discountPercent}</p>
-          )}
-          {product.startPricePerKilo && (
-            <p className="text-gray-700 text-base">Start Price per Kilo: {product.startPricePerKilo}</p>
-          )}
-          <p className="text-gray-700 text-base">Price per Kilo: {product.pricePerKilo}</p>
-        </div>
-        <div className="px-6 py-4">
-          {product.imageUrls.map((url, index) => (
-            <img key={index} className="w-full" src={url} alt={`${product.title} ${index}`} />
-          ))}
+import { Product } from '@/types';
+import Image from 'next/image';
+import Link from 'next/link';
+import React from 'react'
+
+interface Props {
+  product: Product;
+}
+
+const ProductCard = ({ product }: Props) => {
+  return (
+    <Link href={`/products/${product._id}`} className="product-card">
+      <div className="product-card_img-container">
+        <Image 
+          src={product.image}
+          alt={product.title}
+          width={200}
+          height={200}
+          className="product-card_img"
+        />
+      </div>
+
+      <div className="flex flex-col gap-3">
+        <h3 className="product-title">{product.title}</h3>
+
+        <div className="flex justify-between">
+          <p className="text-black opacity-50 text-lg capitalize">
+            {product.category}
+          </p>
+
+          <p className="text-black text-lg font-semibold">
+            <span>{product?.currency}</span>
+            <span>{product?.currentPrice}</span>
+          </p>
         </div>
       </div>
-    );
-  }
-  
-  export default ProductCard;
-  
+    </Link>
+  )
+}
+
+export default ProductCard

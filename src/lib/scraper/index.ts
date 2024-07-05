@@ -13,7 +13,7 @@ export async function scrapeProduct(url: string) {
     // Go to the URL
     await page.goto(url, { waitUntil: 'networkidle2' });
 
-    // Extract the product price, title, images, price per kilo, discount percentage, and start price per kilo
+    // Extract the product details
     const result = await page.evaluate(() => {
       const titleElement = document.querySelector('.item-title');
       const discountPriceElement = document.querySelector('.item-DscntPrice');
@@ -82,7 +82,17 @@ export async function scrapeProduct(url: string) {
     // Close Puppeteer
     await browser.close();
 
-    return result;
+    // Return the scraped data
+    return {
+      url,
+      title: result.title,
+      currentPrice: result.currentPrice,
+      startingPrice: result.startingPrice,
+      imageUrls: result.imageUrls,
+      pricePerKilo: result.pricePerKilo,
+      discountPercent: result.discountPercent,
+      startPricePerKilo: result.startPricePerKilo
+    };
   } catch (error) {
     console.log(error);
   }
