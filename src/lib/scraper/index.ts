@@ -1,6 +1,7 @@
 "use server"
 
 import puppeteer from 'puppeteer';
+import prisma from '../prisma';
 
 export async function scrapeProduct(url: string) {
   if (!url) return;
@@ -29,7 +30,7 @@ export async function scrapeProduct(url: string) {
 
       let startingPrice = '';
       let currentPrice = '';
-      let imageUrls = [];
+      let imageUrls: string[] = [];
       let pricePerKilo = '';
       let discountPercent = '';
       let startPricePerKilo = '';
@@ -45,22 +46,14 @@ export async function scrapeProduct(url: string) {
         currentPrice = priceElement.textContent?.trim() ?? '';
       }
 
-      const ensureAbsoluteUrl = (url) => {
-        if (!url) return '';
-        if (url.startsWith('http://') || url.startsWith('https://')) {
-          return url;
-        }
-        return new URL(url, document.baseURI).href;
-      };
-
       if (mainImageElement) {
-        imageUrls.push(ensureAbsoluteUrl(mainImageElement.getAttribute('src')));
+        imageUrls.push(mainImageElement.getAttribute('src') ?? '');
       }
 
       extraImageElements.forEach(img => {
         const src = img.getAttribute('src');
         if (src) {
-          imageUrls.push(ensureAbsoluteUrl(src));
+          imageUrls.push(src);
         }
       });
 
@@ -79,10 +72,23 @@ export async function scrapeProduct(url: string) {
     console.log("Discount Percent:", result.discountPercent);
     console.log("Start Price per Kilo:", result.startPricePerKilo);
 
+    // Save the data to Prisma database
+    const product = await prisma.product.create({
+      data: {
+        title: result.title,
+        startingPrice: result.startingPrice,
+        currentPrice: result.currentPrice,
+        imageUrls: result.imageUrls,
+        pricePerKilo: result.pricePerKilo,
+        discountPercent: result.discountPercent,
+        startPricePerKilo: result.startPricePerKilo
+      }
+    });
+
     // Close Puppeteer
     await browser.close();
 
-    return result;
+    return product;
   } catch (error) {
     console.log(error);
   }

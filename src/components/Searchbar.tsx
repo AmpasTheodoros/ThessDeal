@@ -28,7 +28,6 @@ const isValidProductURL = (url: string) => {
 const Searchbar = () => {
   const [searchPrompt, setSearchPrompt] = useState('');
   const [isLoading, setIsLoading] = useState(false);
-  const [products, setProducts] = useState([]);
 
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -43,7 +42,6 @@ const Searchbar = () => {
       // Scrape the product page
       const product = await scrapeAndStoreProduct(searchPrompt);
       console.log(product);
-      setProducts([...products, product]);
     } catch (error) {
       console.log(error);
     } finally {
@@ -72,13 +70,6 @@ const Searchbar = () => {
           {isLoading ? 'Searching...' : 'Search'}
         </Button>
       </form>
-      <section className="trending-section mt-8">
-        <div className="flex flex-wrap gap-x-8 gap-y-16">
-          {products.map((product, index) => (
-            <ProductCard key={index} product={product} />
-          ))}
-        </div>
-      </section>
     </div>
   )
 }

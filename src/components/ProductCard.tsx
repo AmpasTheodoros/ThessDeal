@@ -1,27 +1,42 @@
+'use client';
+
+import axios from 'axios';
+import { useAuth, useUser } from '@clerk/nextjs';
+
 const ProductCard = ({ product }) => {
-    return (
-      <div className="max-w-sm rounded overflow-hidden shadow-lg bg-white">
-        <img className="w-full" src={product.imageUrls[0]} alt={product.title} />
-        <div className="px-6 py-4">
-          <div className="font-bold text-xl mb-2">{product.title}</div>
-          <p className="text-gray-700 text-base">Old Price: {product.startingPrice}</p>
-          <p className="text-gray-700 text-base">New Price: {product.currentPrice}</p>
-          {product.discountPercent && (
-            <p className="text-gray-700 text-base">Discount: {product.discountPercent}</p>
-          )}
-          {product.startPricePerKilo && (
-            <p className="text-gray-700 text-base">Start Price per Kilo: {product.startPricePerKilo}</p>
-          )}
-          <p className="text-gray-700 text-base">Price per Kilo: {product.pricePerKilo}</p>
-        </div>
-        <div className="px-6 py-4">
-          {product.imageUrls.map((url, index) => (
-            <img key={index} className="w-full" src={url} alt={`${product.title} ${index}`} />
-          ))}
-        </div>
+  const { isSignedIn } = useAuth();
+  const { user } = useUser();
+
+  const handleFavorite = async () => {
+    if (!isSignedIn) {
+      window.location.href = '/sign-in'; // Redirect to the sign-in page
+      return;
+    }
+
+    try {
+      const response = await axios.post('/api/favorites', { productId: product.id });
+      console.log('Favorite added:', response.data);
+    } catch (error) {
+      console.error('Error adding favorite:', error);
+    }
+  };
+
+  return (
+    <div className="product-card p-4 border rounded-lg shadow-md">
+      <h2 className="text-xl font-bold">{product.title}</h2>
+      <p>Old Price: {product.startingPrice}</p>
+      <p>New Price: {product.currentPrice}</p>
+      <p>Discount Percent: {product.discountPercent}</p>
+      <p>Price per Kilo: {product.pricePerKilo}</p>
+      <p>Start Price per Kilo: {product.startPricePerKilo}</p>
+      <div className="images">
+        {product.imageUrls.map((url, index) => (
+          <img key={index} src={url} alt={`Product Image ${index + 1}`} className="w-32 h-32 object-cover" />
+        ))}
       </div>
-    );
-  }
-  
-  export default ProductCard;
-  
+      <button onClick={handleFavorite} className="mt-4 bg-blue-500 text-white py-2 px-4 rounded">Add to Favorites</button>
+    </div>
+  );
+};
+
+export default ProductCard;
